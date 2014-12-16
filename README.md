@@ -9,9 +9,7 @@ I connected a RFID reader, a HC-05 bluetooth dongle, a buzzer and a 16x2 LCD to 
 Arduino Pinout:
 ===============
 Digital pin 02 - RFID RX
-
 Digital pin 03 - RFID TX
-
 
 Digital pin 04 - Bluetooth RX
 
