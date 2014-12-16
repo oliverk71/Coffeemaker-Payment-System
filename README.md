@@ -6,6 +6,10 @@ As commands differ from one coffeemaker to another, they have to be changed in t
 
 I connected a RFID reader, a HC-05 bluetooth dongle, a buzzer and a 16x2 LCD to an Arduino Uno and put it into a housing, wrote a code and finally got a complete RFID payment system for use in offices and institutes with up to 40 coffee drinkers. The RFID reader can be replaced easily with a NFC reader. Already existing cards can be used! Any RFID (or NFC) tag can be registered. 
 
+Registering of new cards, charging (up to 25,50 EUR by now) and deleting of old cards is triggered via the Android app.´
+
+The code is provided 'as is', without any guarantuee. 
+
 Arduino Pinout:
 ===============
 Digital pin 02 - RFID RX
