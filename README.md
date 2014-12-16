@@ -8,18 +8,28 @@ I connected a RFID reader, a HC-05 bluetooth dongle, a buzzer and a 16x2 LCD to 
 
 Arduino Pinout:
 ===============
-
 Digital pin 02 - RFID RX
+
 Digital pin 03 - RFID TX
 
+
 Digital pin 04 - Bluetooth RX
+
 Digital pin 05 - Bluetooth TX
+
 Digital pin 10 - Coffeemaker RX
+
 Digital pin 11 - Coffeemaker TX
+
 Digital pin 12 - buzzer
 
+
+
 Analog pin 04 - LCD I2C SDA
+
 Analog pin 05 - LCD I2C SCL
+
+
 
 
 Jura coffeemakers pinouts
