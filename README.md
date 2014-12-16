@@ -7,7 +7,7 @@ As commands differ from one coffeemaker to another, they have to be changed in t
 I connected a RFID reader, a HC-05 bluetooth dongle, a buzzer and a 16x2 LCD to an Arduino Uno and put it into a housing, wrote a code and finally got a complete RFID payment system for use in offices and institutes with up to 40 coffee drinkers. The RFID reader can be replaced easily with a NFC reader. Already existing cards can be used! Any RFID (or NFC) tag can be registered. 
 
 Arduino Pinout:
-
+===============
 Digital pin 02 - RFID RX
 Digital pin 03 - RFID TX
 Digital pin 04 - Bluetooth RX
@@ -20,7 +20,9 @@ Analog pin 04 - LCD I2C SDA
 Analog pin 05 - LCD I2C SCL
 
 
-Jura coffeemakers pinouts (taken from http://protocol-jura.do.am/)
+Jura coffeemakers pinouts
+=========================
+(taken from http://protocol-jura.do.am/)
 
 Jura 4-pin interface (e.g. Jura Impressa S95):
 (from left to right)
