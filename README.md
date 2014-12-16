@@ -35,7 +35,7 @@ Jura coffeemakers pinouts
 =========================
 (taken from http://protocol-jura.do.am/)
 
-*Jura 4-pin interface (e.g. Jura Impressa S95):*
+_Jura 4-pin interface (e.g. Jura Impressa S95):_
 
 (from left to right)
 
