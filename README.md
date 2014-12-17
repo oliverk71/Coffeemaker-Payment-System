@@ -28,6 +28,7 @@ Digital pin 12 - buzzer
 
 
 
+
 Analog pin 04 - LCD I2C SDA
 
 Analog pin 05 - LCD I2C SCL
