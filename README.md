@@ -41,7 +41,7 @@ Digital pin 10 - Coffeemaker RX
 Digital pin 11 - Coffeemaker TX    
 Digital pin 12 - buzzer  
   
-Analog pin 04 - LCD I2C SDA 
+Analog pin 04 - LCD I2C SDA  
 Analog pin 05 - LCD I2C SCL  
   
 Jura coffeemakers pinouts  
