@@ -7,7 +7,7 @@ Hardware: RFID reader, HC-05 bluetooth dongle, a buzzer, a16x2 LCD, Arduino Uno,
 wrote a code and finally got a complete RFID payment system for use in offices and institutes with up to 40 coffee drinkers. The RFID reader could be replaced with a NFC reader, but I had the RFID lying around. 
    
 Advantages:   
-Complete low-cost payment system for small offices!    
+Complete low-cost payment system for use with houshold coffeemakers in small offices!    
 Already existing cards can be used! Any RFID (or NFC) tag can be registered!    
 No lose of guarantee! Uses the service port / serial connection of the coffeemaker!   
 In theory a maximum of 200 cards can be registered, but it is limited to 40 in the code (variable n).   
