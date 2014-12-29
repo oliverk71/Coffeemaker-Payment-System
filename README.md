@@ -1,28 +1,28 @@
 Coffeemaker-Payment-System
 ==========================
    
-An Arduino-based RFID payment system for coffeemakers with toptronic logic unit, as Jura Impressa S95 and others without modifying the coffeemaker itself (to keep the guarantuee). This code works with Jura Impressa S90 and S95 and should work with many others, too, although the commands may have to be modified, because they differ from model to model.
+An Arduino-based RFID payment system for coffeemakers with toptronic logic print, as Jura Impressa S95 and many others. A modification of the coffeemaker is NOT necessary. This code works with Jura Impressa S90, S95 and X7 and should work with many others, too. The commands may have to be modified, because they may differ from model to model.
    
-Hardware: RFID reader, HC-05 bluetooth dongle, a buzzer, a16x2 LCD, Arduino Uno, housing, f/m jumper wires and/or sensor cable. Depending on the coffeemaker: D-SUB or 4-pin.    
+Hardware: RDM630 RFID reader 125 kHz, HC-05 bluetooth dongle, a buzzer, a 16x2 LCD, Arduino Uno, housing, f/m jumper wires and/or sensor cable. Depending on the coffeemaker: D-SUB or 4-pin.    
 wrote a code and finally got a complete RFID payment system for use in offices and institutes with up to 40 coffee drinkers. The RFID reader could be replaced with a NFC reader, but I had the RFID lying around. 
    
 Advantages:   
-Complete low-cost payment system for use with houshold coffeemakers in small offices!    
+Complete low-cost payment system for use in small offices!    
 Already existing cards can be used! Any RFID (or NFC) tag can be registered!    
-No lose of guarantee! Uses the service port / serial connection of the coffeemaker!   
+Uses the service port / serial connection of the coffeemaker!   
 In theory a maximum of 200 cards can be registered, but it is limited to 40 in the code (variable n).   
 Easy registering, charging, deleting and setting up price list via Android app! Or write your own application to control the device from a Linux or Windows PC.   
    
-Coffeemaker communication tool:     
-This is a kind of translator, which translate every ASCII character entered into the serial console into 4 bytes of machine code. Use this to read the memory of your coffeemaker, switch it on and off, start preparing coffee, for diagnosis and more. But take care not to accidently reset your coffeemaker's memory! A few commands can be found here: http://protocol-jura.do.am/   
+Coffeemaker-communication-tool.ino:     
+Basically translates ASCII character entered into the serial console into 4 bytes of coffeemaker machine code. Use this to read the memory of your coffeemaker, switch it on and off, start preparing coffee, for diagnosis and more. But take care not to accidently reset your coffeemaker's memory! A few commands can be found here: http://protocol-jura.do.am/   
      
-Coffeemaker PS initialization tool:       
-Has to be run once before using the coffeemaker payment system to write zeros to the Arduino's EEPROM, where card numbers, credits and product prices will be stored.If you are not sure: Choose 'i'.    
+EEPROM_tool.ino:       
+Has to be used once to initiate the coffeemaker payment system to write zeros to the Arduino's EEPROM, where card numbers, credits and product prices will be stored.    
    
-Coffeemaker Payment System v0.6.1:    
+CoffeemakerPS.ino:    
 This is the actual payment system sketch for Arduino. Pinout see below. You should first write zeros to the EEPROM and activate Inkasso mode by initializing with the above tool. Then upload the program code. Install the app on your phone and start it. Enter prices in the appropriate text boxes, connect to the device and upload the price list including the standard value for newly registered cards. Then start registering your cards. When you are done you should be able to check your credit on your card or draw a coffee.    
    
-Coffeemaker PS Android App: You can use this Android app to start registering cards (device will stop registering after 10 s, if no more card is recognized), charge a card with 10 or 20 EUR, delete a card (if it has been lost, for example) and set the price for each product. The app is still a little bit buggy, but you can use any other bluetooth terminal app you want.    
+CoffeemakerPS.apk: You can use this Android app to start registering cards (device will stop registering after 10 s, if no more card is recognized), charge a card with 10 or 20 EUR, delete a card (if it has been lost, for example) and set the price for each product. The app is still a little bit buggy, but you can use any other bluetooth terminal app you want.    
 "RRR" triggers registering cards   
 "CCC031000" charges card on index 03 with 10 EUR.   
 "REA" to read the price list (not yet working)   
@@ -33,12 +33,12 @@ The code is provided 'as is', without any guarantuee. It is still in experimenta
    
 Arduino Pinout:   
 ===============   
-Digital pin 02 - RFID RX    
-Digital pin 03 - RFID TX  
-Digital pin 04 - Bluetooth RX  
-Digital pin 05 - Bluetooth TX  
-Digital pin 10 - Coffeemaker RX   
-Digital pin 11 - Coffeemaker TX    
+Digital pin 00 - RX (coffeemaker)   
+Digital pin 01 - TX (coffeemaker)   
+Digital pin 02 - RX (RFID)   
+Digital pin 03 - TX (RFID)   
+Digital pin 04 - RX (bluetooth)   
+Digital pin 05 - TX (bluetooth)      
 Digital pin 12 - buzzer  
    
 Analog pin 04 - LCD I2C SDA  
