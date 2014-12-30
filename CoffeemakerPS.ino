@@ -1,8 +1,7 @@
 
 /* An Arduino-based RFID payment system for coffeemakers with toptronic logic unit, as Jura Impressa S95
- and others without modifying the coffeemaker itself. Commands may differ from one coffeemaker to another, 
- they have to be changed in the code, if necessary. Make sure not to accidently reset your coffeemaker's 
- EEPROM! Make a backup, if necessary. 
+ and others without modifying the coffeemaker itself (to keep the guarantuee). As commands differ from one
+ coffeemaker to another, they have to be changed in the code, if necessary.
  
  Hardware used: Arduino Uno, 16x2 LCD I2C, "RDM 630" RFID reader 125 kHz, HC-05 bluetooth, buzzer, 
  male/female jumper wires, a housing.
@@ -18,7 +17,7 @@
  charging and deleting of old cards is done via the Android app, but it would be possible to use any 
  other bluetooth client software on smartphone or PC.
  
- The code is provided 'as is', without any guarantuee. Use at your own risk! */
+ The code is provided 'as is', without any guarantuee.*/
 
 #include <Wire.h>
 #include <SoftwareSerial.h>
@@ -114,7 +113,7 @@ void loop()
   //  buttonPress = false;
   while( myBT.available() ){  
     BTstring += String(char(myBT.read()));
-    delay(7);  // 60 hatte funktioniert angeblich, 1 nicht, mal 7 testen. auch nicht
+    delay(1);  // müsste auch weniger reichen, aber 60 hatte funktioniert
   }
   if (BTstring.length() > 0){
     // BT: Start registering new cards until 10 s no valid, unregistered card
@@ -175,9 +174,9 @@ void loop()
     }
     // BT: Send RFID card numbers to app    
     if(BTstring == "LLL"){  // 'L' for 'list' sends RFID card numbers to app   
-      for(byte i=0;i<n;i++){  // variable type has to be byte otherwise it does not work
+      for(i=0;i<n;i++){  
         myBT.print(print10digits(RFIDcards[i])); 
-        if (i < (n-1)) myBT.write(',');  // write comma after card number if not last
+        if (i < n-1) myBT.write(',');  // write comma after card number if not last
       }
     }
     // BT: Delete a card and referring credit   
@@ -202,8 +201,9 @@ void loop()
       lcd.noBacklight(); 
     }    
     // BT: Charge a card    
-    if((BTstring.startsWith("CCC") == true) ){  // && (BTstring.length() >= 7 )
-      char a1 = BTstring.charAt(3);  // 3 and 4 => card list picker index (from app)
+    if(BTstring.startsWith("CCC") == true){
+      // first 2 characters after 'C' is the index of the card
+      char a1 = BTstring.charAt(3);  // 3 and 4 => index
       char a2 = BTstring.charAt(4);
       char a3 = BTstring.charAt(5);  // 5 and 6 => value to charge
       char a4 = BTstring.charAt(6);    
@@ -220,17 +220,17 @@ void loop()
       lcd.backlight();
       lcd.print(print10digits(RFIDcards[i])); 
       lcd.setCursor(0,1);
-      lcd.print(F("+"));   
+      lcd.print(F("+"));
       lcd.print(printCredit(j));
       delay(2000);
       lcd.noBacklight();
       lcd.clear();
       creditArray[i] += j;
     }
-    // BT: Receives (updated) price list from app.  
+    // BT: Change prices. Write price list product 1 to 10 (0-9), prices divided by commas   
     if(BTstring.startsWith("CHA") == true){
       k = 3;
-      for (i = 0; i < 10;i++){  
+      for (i = 0; i < 8;i++){  
         String tempString = "";
         do {
           tempString += BTstring.charAt(k);
@@ -253,19 +253,18 @@ void loop()
       lcd.noBacklight();
       lcd.clear();
     }
-    // BT: Sends price list to app. Product 1 to 10 (0-9), prices divided by commas  
-    if(BTstring.startsWith("REA") == true){
-      delay(100); // testweise      
+    // BT: read price list product 1 to 10 (0-9), prices divided by commas  
+    if(BTstring.startsWith("REA") == true){      
       for (i = 0; i < 10; i++) {
         myBT.print(priceArray[i]);
         if (i < 10) myBT.write(',');
       }
     }  
 
-    if(BTstring == "?M3"){  
+    if(BTstring == "?M3\r\n"){  
+      lcd.backlight();
       toCoffeemaker("?M3\r\n");  // activates incasso mode (= no coffee w/o "ok" from the payment system! May be inactivated by sending "?M3" without quotation marks)
       delay (100);               // wait for answer from coffeemaker
-      lcd.backlight();
       if (fromCoffeemaker() == "?ok\r\n"){
         beep(1);
         lcd.print(F("Inkasso mode"));
@@ -284,9 +283,9 @@ void loop()
     }
 
     if(BTstring == "?M1"){  
+      lcd.backlight();
       toCoffeemaker("?M1\r\n");  // deactivates incasso mode (= no coffee w/o "ok" from the payment system! May be inactivated by sending "?M3" without quotation marks)
       delay (100);               // wait for answer from coffeemaker
-      lcd.backlight();
       if (fromCoffeemaker() == "?ok\r\n"){
         beep(1);
         lcd.print(F("Inkasso mode"));
@@ -308,49 +307,46 @@ void loop()
   // Get key pressed on coffeemaker
   String message = fromCoffeemaker();   // gets answers from coffeemaker 
   if (message.length() > 0){
-    if (message.charAt(0) == '?' && message.charAt(1) == 'P'){     // message starts with '?P' ?
+    if (message.charAt(0) == '?' && message.charAt(1) == 'P'){        // message command? (start with ?)
       buttonPress = true;
       buttonTime = millis(); 
+      price = 0;
       lcd.backlight();
       if (message == "?PAE\r\n"){
         price = priceArray[0];        // product 1 (small cup)
         lcd.print(F("Small cup"));
       }     
-      else if (message == "?PAF\r\n"){
+      if (message == "?PAF\r\n"){
         price = priceArray[1];      // product 2 (2 small cups)
         lcd.print(F("2 small cups"));
       } 
-      else if (message == "?PAA\r\n"){         
+      if (message == "?PAA\r\n"){         // large cup
         price = priceArray[2];   // product 3 (large cup)
         lcd.print(F("Large cup"));
       } 
-      else if (message == "?PAB\r\n"){
+      if (message == "?PAB\r\n"){
         price = priceArray[3];     // product 4 (2 large cups)
         lcd.print(F("2 large cups"));
       } 
-      else if (message == "?PAJ\r\n"){
+      if (message == "?PAJ\r\n"){
         price = priceArray[4];      // product 5 (steam)
         lcd.print(F("Steam 2"));
       } 
-      else if (message == "?PAI\r\n"){
+      if (message == "?PAI\r\n"){
         price = priceArray[5];      // product 6 (steam)
         lcd.print(F("Steam 1"));
       }    
-      else if (message == "?PAG\r\n"){
+      if (message == "?PAG\r\n"){
         price = priceArray[6];      // product 7 (extra large cup)
         lcd.print(F("Extra large cup"));
-      } 
-      else {
-        lcd.print(F("Read error"));
       }
       lcd.setCursor(0,1);  
       lcd.print(printCredit(price));
     }
   }
 
-  if (millis()-buttonTime > 5000){  
+  if (millis()-buttonTime > 3000){
     buttonPress = false;
-    price = 0;
     lcd.noBacklight();
     lcd.clear();     
   }
@@ -369,7 +365,7 @@ void loop()
 
   if (RFIDcard > 0){
     k = n;
-    for(byte i=0;i<n;i=i++){         
+    for(i=0;i<n;i=i++){         
       if (((RFIDcard) == (RFIDcards[i])) && (RFIDcard > 0 )){
         k = i;
         if(buttonPress == true){                 // button pressed on coffeemaker?
@@ -378,6 +374,10 @@ void loop()
             lcd.backlight();
             lcd.setCursor(0, 0);
             lcd.print(print10digits(RFIDcards[k]));
+            lcd.print(" ");
+            lcd.print(k);
+            lcd.print(" ");
+            lcd.print(i);        
             lcd.setCursor(0, 1);
             lcd.print(printCredit(creditArray[k]));
             creditConvert.creditInt = creditArray[k];
@@ -394,7 +394,7 @@ void loop()
             beep(2);  
           }
         } 
-        else {                                // if no button was pressed on coffeemaker / check credit
+        else {                                // if no button was pressed on coffeemaker
           lcd.backlight();
           lcd.print(print10digits(RFIDcards[k]));
           lcd.setCursor(0, 1);
@@ -623,7 +623,6 @@ void ISRreceiveData1(){
   recvBitCount++;
   isData1Low = 1;
 }
-
 
 
 
