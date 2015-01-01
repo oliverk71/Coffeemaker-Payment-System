@@ -9,9 +9,9 @@
  
  pinouts:
  Analog pins 4,5 - LCD I2C
- Digital pins 0,1 - Coffeemaker RX, TX (hardware serial)
+ Digital pins 0,1 - myBT bluetooth RX, TX (hardware serial)
  Digital pins 2,3 - RFID RX, TX
- Digital pins 4,5 - Bluetooth RX, TX (software serial)
+ Digital pins 4,5 - myCoffeemaker RX, TX (software serial)
  Digital pin 12 - piezo buzzer
  
  Already existing cards can be used! Any 125 kHz RFID tag can be registered. Registering of new cards, 
@@ -28,7 +28,7 @@
 #define error(s) error_P(PSTR(s))
 
 LiquidCrystal_I2C lcd(0x27,16,2);
-SoftwareSerial myBT(4,5); // RX, TX
+SoftwareSerial myCoffeemaker(4,5); // RX, TX
 
 // general variables
 int i;
@@ -80,8 +80,8 @@ void setup()
   delay(3500);
   lcd.clear();
   lcd.print(F("starting up"));
-  Serial.begin(9600);         // start serial communication at 9600bps
-  myBT.begin(9600);           // Bluetooth at 9600bps (default)
+  myCoffeemaker.begin(9600);         // start serial communication at 9600bps
+  Serial.begin(9600);           // Bluetooth at 9600bps (default)
   attachInterrupt(0, ISRreceiveData0, FALLING );  // RFID: data0/rx is connected to pin 2, which results in INT 0
   attachInterrupt(1, ISRreceiveData1, FALLING );  // RFID: data1/tx is connected to pin 3, which results in INT 1
   for (int i = 0; i < n; i++){  // read card numbers and referring credit from EEPROM
@@ -112,8 +112,8 @@ void loop()
   // Check if there is a bluetooth connection and command
   BTstring = "";
   //  buttonPress = false;
-  while( myBT.available() ){  
-    BTstring += String(char(myBT.read()));
+  while( Serial.available() ){  
+    BTstring += String(char(Serial.read()));
     delay(7);  // 60 hatte funktioniert angeblich, 1 nicht, mal 7 testen. auch nicht
   }
   if (BTstring.length() > 0){
@@ -176,8 +176,8 @@ void loop()
     // BT: Send RFID card numbers to app    
     if(BTstring == "LLL"){  // 'L' for 'list' sends RFID card numbers to app   
       for(byte i=0;i<n;i++){  // variable type has to be byte otherwise it does not work
-        myBT.print(print10digits(RFIDcards[i])); 
-        if (i < (n-1)) myBT.write(',');  // write comma after card number if not last
+        Serial.print(print10digits(RFIDcards[i])); 
+        if (i < (n-1)) Serial.write(',');  // write comma after card number if not last
       }
     }
     // BT: Delete a card and referring credit   
@@ -257,13 +257,13 @@ void loop()
     if(BTstring.startsWith("REA") == true){
      // delay(100); // testweise      
       for (i = 0; i < 11; i++) {
-        myBT.print(int(priceArray[i]/100));
-        myBT.print('.');
+        Serial.print(int(priceArray[i]/100));
+        Serial.print('.');
         if ((priceArray[i]%100) < 10){
-          myBT.print('0');
+          Serial.print('0');
         }
-        myBT.print(priceArray[i]%100);
-        if (i < 10) myBT.write(',');
+        Serial.print(priceArray[i]%100);
+        if (i < 10) Serial.write(',');
       }
     }  
 
@@ -347,6 +347,7 @@ void loop()
       } 
       else {
         lcd.print(F("Read error"));
+        buttonPress = false;
       }
       lcd.setCursor(0,1);  
       lcd.print(printCredit(price));
@@ -425,14 +426,14 @@ void loop()
 String fromCoffeemaker(){
   String inputString = "";
   char d4 = 255;
-  while (Serial.available()){    // if data is available to read
-    byte d0 = Serial.read();
+  while (myCoffeemaker.available()){    // if data is available to read
+    byte d0 = myCoffeemaker.read();
     delay (1); 
-    byte d1 = Serial.read();
+    byte d1 = myCoffeemaker.read();
     delay (1); 
-    byte d2 = Serial.read();
+    byte d2 = myCoffeemaker.read();
     delay (1); 
-    byte d3 = Serial.read();
+    byte d3 = myCoffeemaker.read();
     delay (7);
     bitWrite(d4, 0, bitRead(d0,2));
     bitWrite(d4, 1, bitRead(d0,5));
@@ -467,13 +468,13 @@ void toCoffeemaker(String outputString)
     bitWrite(d2, 5, bitRead(outputString.charAt(a),5));
     bitWrite(d3, 2, bitRead(outputString.charAt(a),6));  
     bitWrite(d3, 5, bitRead(outputString.charAt(a),7)); 
-    Serial.write(d0); 
+    myCoffeemaker.write(d0); 
     delay(1);
-    Serial.write(d1); 
+    myCoffeemaker.write(d1); 
     delay(1);
-    Serial.write(d2); 
+    myCoffeemaker.write(d2); 
     delay(1);
-    Serial.write(d3); 
+    myCoffeemaker.write(d3); 
     delay(7);
   }
 }
