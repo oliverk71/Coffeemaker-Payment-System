@@ -1,7 +1,7 @@
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
 
-SoftwareSerial myCoffeemaker(10,11); // RX, TX
+SoftwareSerial myCoffeemaker(4,5); // RX, TX
 
 long int cardNr;
 
@@ -23,9 +23,10 @@ void setup() {
   myCoffeemaker.begin(9600);
   Serial.println("(1) read data in Arduino EEPROM and display HEX values ");
   Serial.println("(2) read data in Arduino EEPROM and display card numbers, credits and price list.");
-  Serial.println("(3) delete all data in EEPROM");
-  Serial.println("(4) initialize for CoffeemakerPM (deletes EEPROM and activates Inkasso mode.)");
-  Serial.println("(5) deactivates incasso mode.");
+  Serial.println("(3) erase all data in Arduino EEPROM (overwrite with zeros)");
+  Serial.println("(4) initialize for CoffeemakerPM (erases EEPROM and activates Inkasso mode.)");
+  Serial.println("(5) deactivate incasso mode.");
+  Serial.println("(6) read EEPROM of the coffeemaker and display the HEX values.");
 }
 
 void loop() {
@@ -46,29 +47,38 @@ void loop() {
     }
 
     if (c == '2'){
+        Serial.println();
+        Serial.println("Registered cards");
+        Serial.println("================");      
       for (int i = 0; i < 40; i++){  // read card numbers and referring credit from EEPROM
         cardConvert.cardByte[0] = EEPROM.read(i*6);
         cardConvert.cardByte[1] = EEPROM.read(i*6+1);
         cardConvert.cardByte[2] = EEPROM.read(i*6+2);
         cardConvert.cardByte[3] = EEPROM.read(i*6+3);
-      //  RFIDcards[i]  = cardConvert.cardNr;  // union to put the four bytes together
         Serial.print(i);
         Serial.print("\t");
-        Serial.print(cardConvert.cardNr);
+        Serial.print(print10digits(cardConvert.cardNr));
         Serial.print("\t");
         creditConvert.creditByte[0] = EEPROM.read(i*6+4);
         creditConvert.creditByte[1] = EEPROM.read(i*6+5);
-        Serial.println(float(creditConvert.creditInt/100));
+        Serial.println(printCredit(creditConvert.creditInt));
       }
       Serial.println();
+      Serial.println("Price list");
+      Serial.println("==========");
       for (int i = 0; i < 10; i++){   // read price list products 1 to 10 and start value for new cards
         creditConvert.creditByte[0] = EEPROM.read(i*2+1000);
         creditConvert.creditByte[1] = EEPROM.read(i*2+1001);
         Serial.print("product ");
         Serial.print(i+1);
         Serial.print("\t");
-        Serial.println(float(creditConvert.creditInt/100));
-      }      
+        Serial.println(printCredit(creditConvert.creditInt));
+      }     
+      Serial.println();
+      Serial.print("Standard value for newly registered cards: ");
+      creditConvert.creditByte[0] = EEPROM.read(10*2+1000);
+      creditConvert.creditByte[1] = EEPROM.read(10*2+1001);    
+      Serial.println(printCredit(creditConvert.creditInt));  
     }
       
     if (c == '3' || c == '4'){
@@ -94,14 +104,56 @@ void loop() {
       } else {
         Serial.print("error: coffeemaker not responding");
       }
-    }       
+    }
+    if (c == '6'){
+      Serial.println();
+      for (int i = 0; i <= 0x7F; i++ ){  // 100 nur testweise
+        String outputString = "RE:";
+//        if (a < 10){
+//          outputString += "000";
+//        } 
+//        else if (a < 100) {
+//          outputString += "00";
+//        }
+//        else if (a < 1000){
+//          // outputString="";
+//          outputString += "0";
+//        }
+        if(i <= 0xF){
+          outputString += "0";
+        }
+        outputString += String(i, HEX);
+        outputString.toUpperCase();
+        outputString += "\r\n";
+        toCoffeemaker(outputString);
+//        Serial.print(outputString);
+        delay(50);  // wait for answer?
+        String inputString = fromCoffeemaker();
+        inputString.remove(0,3);
+        inputString.remove(4); 
+//        String Hex = inputString.charAt(2)+""+inputString.charAt(3);
+//        Hex += inputString.charAt(0)+""+inputString.charAt(1);
+//        byte hex = byte(Hex);
+        if (((i+8)%8) == 0){
+          Serial.print("00");
+          if(i<=0xF) Serial.print("0");
+          Serial.print(i, HEX);
+          Serial.print("  ");
+        }
+        Serial.print(inputString);
+        Serial.print(" ");
+        if (((i+1)%8) == 0){
+          Serial.println();
+        }
+        delay(100);
+      }
+    }    
   }    
 }
 
 
 
 String fromCoffeemaker(){
-  delay(20); // testweise
   String inputString = "";
   char d4 = 255;
   while (myCoffeemaker.available()){    // if data is available to read
@@ -135,13 +187,11 @@ String fromCoffeemaker(){
 
 void toCoffeemaker(String outputString)
 {
-  myCoffeemaker.begin(9600);
-  delay(20); // testweise
-  Serial.println();
-  Serial.print(outputString);
-  Serial.println(outputString.length());
+//  Serial.println();
+//  Serial.print(outputString);
+//  Serial.println(outputString.length());
   for (byte a = 0; a < outputString.length(); a++){
-    Serial.print(outputString.charAt(a));
+//    Serial.print(outputString.charAt(a));
     byte d0 = 255;
     byte d1 = 255;
     byte d2 = 255;
@@ -164,4 +214,29 @@ void toCoffeemaker(String outputString)
     myCoffeemaker.write(d3); 
     delay(7);
   }
+}
+
+String printCredit(int credit){
+  int euro = ((credit)/100);  //  int euro = ((credit*10)/100);
+  int cent = ((credit)%100);  //  int cent = ((credit*10)%100); 
+  String(output);
+  output = String(euro);
+  output += ',';
+  output += String(cent);
+  if (cent < 10){
+    output += '0';
+  }
+  output += F(" EUR");  
+  return output;
+}
+
+String print10digits(long int number) {
+  String(tempString) = String(number);
+  String(newString) = "";
+  int i = 10-tempString.length();
+  for (int a = 0; a < (10-tempString.length()); a++){
+    newString += "0";
+  }
+  newString += number;
+  return newString;
 }
