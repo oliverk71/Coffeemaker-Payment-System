@@ -38,12 +38,14 @@ CoffeemakerPS.apk: You can use this Android app to start registering cards (devi
 "REA" to read the price list (not yet working)   
 "CHA0025,0050,0040,0080,0070,0000,0000,0800" sets the prices entered in the app's textboxes for product 1 to 7 and the value for new cards   
 "LLL" calls for a list of registered RFID cards   
+
+Coffeemaker_voice_control.apk: This is more a gag than a real useful application. The app allows drawing a coffee using voice control or button press. The voice control of the smartphone recognizes the words 'small', 'large' or 'extra large' in a sentence. 
    
 The code is provided 'as is', without any guarantuee. It is still in experimental status and has to be enhanced.   
    
 Arduino Pinout:   
 ===============   
-Digital pin 00 - RX (bluetooth)   (bt module needs to be disconnected to upload a new sketch!)      
+Digital pin 00 - RX (bluetooth)   (bt module needs to be disconnected to upload a new sketch or to use EEPROM tool!)      
 Digital pin 01 - TX (bluetooth)   
 Digital pin 02 - RX (RFID)   
 Digital pin 03 - TX (RFID)   
