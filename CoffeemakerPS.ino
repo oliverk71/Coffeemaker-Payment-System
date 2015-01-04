@@ -307,7 +307,56 @@ void loop()
       delay(2000);
       lcd.clear();
       lcd.noBacklight();     
+    }
+    if(BTstring == "FA:04"){  
+      toCoffeemaker("FA:04\r\n");  // deactivates incasso mode (= no coffee w/o "ok" from the payment system! May be inactivated by sending "?M3" without quotation marks)
+      delay (100);                 // wait for answer from coffeemaker
+      if (fromCoffeemaker() == "?PAE\r\n"){           // coffeemaker sends button as pressed on the machine. no need to verify.
+        delay (100);
+        toCoffeemaker("?ok");
+        lcd.backlight();
+        beep(1);
+        lcd.print(F("Small coffee"));
+        lcd.setCursor(0,1);
+        lcd.print(F("for free!"));  
+        delay(2000);
+        lcd.clear();
+        lcd.noBacklight(); 
+      }    
+    }
+    if(BTstring == "FA:06"){  
+      toCoffeemaker("FA:06\r\n");  // deactivates incasso mode (= no coffee w/o "ok" from the payment system! May be inactivated by sending "?M3" without quotation marks)
+      delay (100);                 // wait for answer from coffeemaker
+      if (fromCoffeemaker() == "?PAA\r\n"){           // coffeemaker sends button as pressed on the machine. no need to verify.
+        delay (100);
+        toCoffeemaker("?ok");
+        lcd.backlight();
+        beep(1);
+        lcd.print(F("Large coffee"));
+        lcd.setCursor(0,1);
+        lcd.print(F("for free!"));  
+        delay(2000);
+        lcd.clear();
+        lcd.noBacklight(); 
+      }    
+    }
+    if(BTstring == "FA:0C"){  
+      toCoffeemaker("FA:0C\r\n");  // deactivates incasso mode (= no coffee w/o "ok" from the payment system! May be inactivated by sending "?M3" without quotation marks)
+      delay (100);                 // wait for answer from coffeemaker
+      if (fromCoffeemaker() == "?PAG\r\n"){           // coffeemaker sends button as pressed on the machine. no need to verify.
+        delay (100);
+        toCoffeemaker("?ok");
+        lcd.backlight();
+        beep(1);
+        lcd.print(F("XXL coffee"));
+        lcd.setCursor(0,1);
+        lcd.print(F("for free!"));  
+        delay(2000);
+        lcd.clear();
+        lcd.noBacklight(); 
+      }    
     }    
+      
   }
 
   // Get key pressed on coffeemaker
@@ -397,7 +446,8 @@ void loop()
             lcd.print(print10digits(RFIDcard));
             lcd.setCursor(0, 1);
             lcd.print(printCredit(creditArray[k]));
-            beep(2);  
+            beep(2);
+            delay(2000);  
           }
         } 
         else {                                // if no button was pressed on coffeemaker / check credit
@@ -419,6 +469,7 @@ void loop()
       lcd.print(F("card unknown!"));		
       k=0; 
       beep(2);
+      delay(2000);
     }     	    
   }
 }
