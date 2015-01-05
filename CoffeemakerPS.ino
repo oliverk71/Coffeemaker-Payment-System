@@ -38,11 +38,12 @@ boolean buttonPress = false;
 const int n = 20;  // max total number of cards with access (up to 200 cards max = 199! Do not exceed otherwise you will overwrite price list!)
 int creditArray[n] = {      // remaining credit on card
 }; 
-int price;                  // price variable
+int price;           // price variable
 int priceArray[11];  // price Array contains prices for up to 10 products. 0 = PAA, 1 = PAB usw. Plus standard value for new cards
-String BTstring="";
-unsigned long time;
-unsigned long buttonTime;
+String BTstring="";  // contains what is received via bluetooth (from app or other bt client)
+unsigned long time;  // timer for RFID etc
+unsigned long buttonTime;  // timer for button press 
+boolean override = false;  // to override payment system by the voice-control/button-press app
 
 // RFID related variables
 byte cardByte[4];
@@ -76,7 +77,7 @@ void setup()
   lcd.backlight();
   lcd.print(F("CoffeemakerPS"));
   lcd.setCursor(0,1);
-  lcd.print(F("  v 0.7"));
+  lcd.print(F("  v 0.8"));
   delay(3500);
   lcd.clear();
   lcd.print(F("starting up"));
@@ -114,7 +115,7 @@ void loop()
   //  buttonPress = false;
   while( Serial.available() ){  
     BTstring += String(char(Serial.read()));
-    delay(7);  // 60 hatte funktioniert angeblich, 1 nicht, mal 7 testen. auch nicht
+    delay(7);  
   }
   if (BTstring.length() > 0){
     // BT: Start registering new cards until 10 s no valid, unregistered card
@@ -131,7 +132,7 @@ void loop()
           RFIDcard = RFID();
           if (RFIDcard > 0) break;
         } 
-        while ( (millis()-time) < 60 );   // changed to 60 (was 5000)
+        while ( (millis()-time) < 60 );  
         k = 0;
         for(i=0;i<n;i++){
           if ((RFIDcard == RFIDcards[i]) && (RFIDcard > 0) && (k == 0)){   //  && (RFIDcard>0 (((RFIDcard) == (RFIDcards[i])) || ((card) > 0))
@@ -159,7 +160,7 @@ void loop()
             EEPROM.write(i*6+3, cardConvert.cardByte[3]);
             creditArray[i] = priceArray[10]; // standard credit for newly registered cards          
             creditConvert.creditInt = creditArray[i];
-            EEPROM.write(i*6+4, creditConvert.creditByte[0]); // 10 EUR standard credit for new cards  
+            EEPROM.write(i*6+4, creditConvert.creditByte[0]);  
             EEPROM.write(i*6+5, creditConvert.creditByte[1]);
             beep(1);
             i = n;
@@ -255,7 +256,7 @@ void loop()
     }
     // BT: Sends price list to app. Product 1 to 10 (0-9), prices divided by commas plus standard value for new cards
     if(BTstring.startsWith("REA") == true){
-     // delay(100); // testweise      
+      // delay(100); // testweise      
       for (i = 0; i < 11; i++) {
         Serial.print(int(priceArray[i]/100));
         Serial.print('.');
@@ -308,56 +309,19 @@ void loop()
       lcd.clear();
       lcd.noBacklight();     
     }
-    if(BTstring == "FA:04"){  
-      toCoffeemaker("FA:04\r\n");  // deactivates incasso mode (= no coffee w/o "ok" from the payment system! May be inactivated by sending "?M3" without quotation marks)
-      delay (100);                 // wait for answer from coffeemaker
-      if (fromCoffeemaker() == "?PAE\r\n"){           // coffeemaker sends button as pressed on the machine. no need to verify.
-        delay (100);
-        toCoffeemaker("?ok");
-        lcd.backlight();
-        beep(1);
-        lcd.print(F("Small coffee"));
-        lcd.setCursor(0,1);
-        lcd.print(F("for free!"));  
-        delay(2000);
-        lcd.clear();
-        lcd.noBacklight(); 
-      }    
+    if(BTstring == "FA:04"){        // small cup ordered via app
+      toCoffeemaker("FA:04\r\n"); 
+      override = true;
     }
-    if(BTstring == "FA:06"){  
-      toCoffeemaker("FA:06\r\n");  // deactivates incasso mode (= no coffee w/o "ok" from the payment system! May be inactivated by sending "?M3" without quotation marks)
-      delay (100);                 // wait for answer from coffeemaker
-      if (fromCoffeemaker() == "?PAA\r\n"){           // coffeemaker sends button as pressed on the machine. no need to verify.
-        delay (100);
-        toCoffeemaker("?ok");
-        lcd.backlight();
-        beep(1);
-        lcd.print(F("Large coffee"));
-        lcd.setCursor(0,1);
-        lcd.print(F("for free!"));  
-        delay(2000);
-        lcd.clear();
-        lcd.noBacklight(); 
-      }    
+    if(BTstring == "FA:06"){        // large cup ordered via app
+      toCoffeemaker("FA:06\r\n");  
+      override = true;
     }
-    if(BTstring == "FA:0C"){  
-      toCoffeemaker("FA:0C\r\n");  // deactivates incasso mode (= no coffee w/o "ok" from the payment system! May be inactivated by sending "?M3" without quotation marks)
-      delay (100);                 // wait for answer from coffeemaker
-      if (fromCoffeemaker() == "?PAG\r\n"){           // coffeemaker sends button as pressed on the machine. no need to verify.
-        delay (100);
-        toCoffeemaker("?ok");
-        lcd.backlight();
-        beep(1);
-        lcd.print(F("XXL coffee"));
-        lcd.setCursor(0,1);
-        lcd.print(F("for free!"));  
-        delay(2000);
-        lcd.clear();
-        lcd.noBacklight(); 
-      }    
+    if(BTstring == "FA:0C"){        // extra large cup ordered via app
+      toCoffeemaker("FA:0C\r\n");  
+      override = true;
     }    
-      
-  }
+  }          
 
   // Get key pressed on coffeemaker
   String message = fromCoffeemaker();   // gets answers from coffeemaker 
@@ -398,18 +362,24 @@ void loop()
         lcd.print(F("Read error"));
         buttonPress = false;
       }
+      if (override == true){
+        price = 0;
+      }
       lcd.setCursor(0,1);  
       lcd.print(printCredit(price));
     }
   }
-
   if (millis()-buttonTime > 5000){  
     buttonPress = false;
     price = 0;
     lcd.noBacklight();
     lcd.clear();     
   }
-
+  if (buttonPress == true && override == true){
+    toCoffeemaker("?ok\r\n");
+    buttonPress == false;
+    override == false;
+  }
   // RFID Identification      
   RFIDcard = 0;  
   time = millis(); 
@@ -680,6 +650,7 @@ void ISRreceiveData1(){
   recvBitCount++;
   isData1Low = 1;
 }
+
 
 
 
