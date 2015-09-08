@@ -394,7 +394,7 @@ void loop()
 
   if (RFIDcard > 0){
     k = n;
-    for(byte i=0;i<n;i=i++){         
+    for(byte i=0;i<n;i++){         
       if (((RFIDcard) == (RFIDcards[i])) && (RFIDcard > 0 )){
         k = i;
         if(buttonPress == true){                 // button pressed on coffeemaker?
