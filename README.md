@@ -1,6 +1,6 @@
 Coffeemaker-Payment-System
 ==========================
-   
+
 An Arduino-based RFID payment system for coffeemakers with toptronic logic print from Eugster electronics, as Jura Impressa S95 and many others. A modification of the coffeemaker's hardware is NOT necessary. This code should work at least with Jura Impressa S90, S95 and X7 although confirmed only for S95 and should work with many others, too. The commands may have to be modified, because they may differ from model to model.    
    
 Hardware: RDM630 RFID reader 125 kHz, HC-05 bluetooth dongle, a buzzer, a 16x2 LCD, Arduino Uno, housing, f/m jumper wires and/or sensor cable. Depending on the coffeemaker: D-SUB or 4-pin.     
@@ -96,3 +96,11 @@ pin 6 - not used
 pin 7 - not used   
 pin 8 - not used  
 pin 9 - not used  
+
+Hyperlinks
+==========
+08.01.2016 (DD.MM.YYYY) Article in German computer magazine c't (German language): http://www.heise.de/ct/ausgabe/2016-2-NFC-Bezahlsystem-fuer-Kaffeevollautomaten-3057531.html?wt_mc=print.ct.2016.02.110#zsdb-article-links
+08.01.2016 Sharespresso project website (Adaption of this project): http://www.heise.de/ct/artikel/Sharespresso-NFC-Bezahlsystem-fuer-Kaffeevollautomaten-3058350.html
+08.01.2016 Sharespresso on GitHub: https://github.com/psct/sharespresso
+27.12.2014 Article on Hackaday: http://hackaday.com/2014/12/27/diy-coffee-payment-system-doesnt-void-your-warranty/
+24.11.2014 Previous project not using service-port: https://www.youtube.com/watch?v=hGvdymS_08c
