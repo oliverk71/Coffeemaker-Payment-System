@@ -100,7 +100,11 @@ pin 9 - not used
 Hyperlinks
 ==========
 08.01.2016 (DD.MM.YYYY) Article in German computer magazine c't (German language): http://www.heise.de/ct/ausgabe/2016-2-NFC-Bezahlsystem-fuer-Kaffeevollautomaten-3057531.html?wt_mc=print.ct.2016.02.110#zsdb-article-links
+
 08.01.2016 Sharespresso project website (Adaption of this project): http://www.heise.de/ct/artikel/Sharespresso-NFC-Bezahlsystem-fuer-Kaffeevollautomaten-3058350.html
+
 08.01.2016 Sharespresso on GitHub: https://github.com/psct/sharespresso
+
 27.12.2014 Article on Hackaday: http://hackaday.com/2014/12/27/diy-coffee-payment-system-doesnt-void-your-warranty/
+
 24.11.2014 Previous project not using service-port: https://www.youtube.com/watch?v=hGvdymS_08c
