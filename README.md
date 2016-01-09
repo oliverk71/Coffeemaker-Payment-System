@@ -69,7 +69,7 @@ pin 3 - RX
 pin 2 - GND  
 pin 1 - TX  
     
-Jura 4-pin interface  
+Jura 5-pin interface  
 (from left to right)  
 pin 5 - +5V   
 pin 4 - not used  
