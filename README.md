@@ -42,6 +42,8 @@ CoffeemakerPS.apk: You can use this Android app to start registering cards (devi
 Coffeemaker_voice_control.apk: This is more a gag than a real useful application. The app allows drawing a coffee using voice control or button press. The voice control of the smartphone recognizes the words 'small', 'large' or 'extra large' in a sentence. 
    
 The code is provided 'as is', without any guarantuee. It is still in experimental status and has to be enhanced.   
+
+I use the LiquidCrystal_I2C library of Marco Schwartz: https://github.com/marcoschwartz/LiquidCrystal_I2C
    
 Arduino Pinout:   
 ===============   
@@ -97,14 +99,4 @@ pin 7 - not used
 pin 8 - not used  
 pin 9 - not used  
 
-Hyperlinks
-==========
-08.01.2016 (DD.MM.YYYY) Article in German computer magazine c't (German language): http://www.heise.de/ct/ausgabe/2016-2-NFC-Bezahlsystem-fuer-Kaffeevollautomaten-3057531.html?wt_mc=print.ct.2016.02.110#zsdb-article-links
 
-08.01.2016 Sharespresso project website (Adaption of this project): http://www.heise.de/ct/artikel/Sharespresso-NFC-Bezahlsystem-fuer-Kaffeevollautomaten-3058350.html
-
-08.01.2016 Sharespresso on GitHub: https://github.com/psct/sharespresso
-
-27.12.2014 Article on Hackaday: http://hackaday.com/2014/12/27/diy-coffee-payment-system-doesnt-void-your-warranty/
-
-24.11.2014 Previous project not using service-port: https://www.youtube.com/watch?v=hGvdymS_08c
